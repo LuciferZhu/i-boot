@@ -12,7 +12,7 @@
 
 .text
 	@ BL1 header info
-	.word 0x4000		@indicate BL1 size = 16KB
+	.word 0x2000		@indicate BL1 size = 8KB
 	.word 0x0
 	.word 0x0
 	.word 0x0
@@ -84,43 +84,57 @@ _cpu_init_crit:
 	beq     _after_copy		/* r0 == r1 then skip flash copy   */
 	
 _relocate:
-	adr r0, _start		@ reality work address
-	ldr r1, =_start		@ link address
-	cmp r0, r1
-	beq _after_copy
-	
-	/* bootloader size:r2 = __bss_start - _start */
-	ldr r2, =__bss_start
-	subs r2, r2, r1
+	/* bootloader size:r2 = __bss_start - _start + 16 */
+	ldr	r1, =_start-16		@ link address
+	ldr	r2, =__bss_start
+	subs 	r2, r2, r1
 	
 _mmcsd_boot:
 	/* @param_0 channel */
-	ldr r0, =0
+	ldr	r0, =0
 	/* @param_1 u32 StartBlkAddress */
-	ldr r1, =1		@ BL1 at block1
+	ldr	r1, =49		@ BL1 at block1,BL2 at block49
 	/* @param_2 u16 blockSize */
-	lsr r2, #9		@ r2 >>= 9, as r2/=512
-	add r2, #1		@ r2 += 1
+	lsr	r2, #9		@ r2 >>= 9, as r2/=512
+	add	r2, #1		@ r2 += 1
 	/* @param_3 u32* memoryPtr */
-	ldr r3, =CFG_PHY_UBOOT_BASE	@ link start address
+	ldr	r3, =CFG_PHY_UBOOT_BASE	@ link start address
 	/* @param_4 bool with_init */
-	ldr r4, =0		@ no init
-	push {r4}		@ fourth arg at stack
+	ldr	r4, =0		@ no init
+	push	{r4}		@ fourth arg at stack
 	
-	ldr r4, copy_sd_mmc_to_mem
-	mov lr, pc
-	ldr pc, [r4]
+	ldr	r4, copy_sd_mmc_to_mem
+	mov	lr, pc
+	ldr	pc, [r4]
+	b	_after_copy
 
 _after_copy:
-	/* print "\na" */
-	ldr r0, =rUART0_BASE
-	ldr r1, =0x0a
-	str r1, [r0, #UTXH_OFFSET]
-	ldr r1, =0x61
-	str r1, [r0, #UTXH_OFFSET]
+
+_enable_mmu:
+	/*  defines the access permission for each of the sixteen memory domains. */
+	ldr	r0, =0x0000ffff		@ [D0-D7]Manager, [D8-D15]No access
+	mcr	p15, 0, r0, c3, c0, 0	@ Write Rt to DACR
+	
+	/* holds the base address of translation table 0. */
+	ldr	r0, _mmu_table_base
+	ldr	r1, =0xfff00000
+	ldr	r2, =CFG_PHY_UBOOT_BASE
+	bic	r0, r0, r1
+	orr	r0, r0, r2
+	mcr	p15, 0, r0, c2, c0, 0	@ Write Rt to 32-bit TTBR0
+	
+	/* enable mmu */
+	mrc	p15, 0, r0, c1, c0, 0	@ Read SCTLR into Rt
+	orr	r0, r0, #(1<<0)		@ ---M ,PL1&0 stage 1 MMU enabled
+	mcr	p15, 0, r0, c1, c0, 0	@ Write Rt to SCTLR
+	nop
+	nop
+	nop
+	nop
 	
 stack_setup:
-	ldr sp, =(CFG_PHY_UBOOT_BASE + CFG_UBOOT_SIZE - 0x1000) @ configure stack into DDR2 sdram, 4KB for malloc, bdinfo
+	ldr	fp, =(CFG_PHY_UBOOT_BASE + CFG_UBOOT_SIZE - 0x1000) @ configure stack into DDR2 sdram, 4KB for malloc, bdinfo
+	sub	sp, fp, #12
 	
 _clean_bss:
 	ldr r0, =__bss_start
@@ -130,26 +144,15 @@ _clean_loop:
 	str r2, [r0], #4
 	cmp r0, r1
 	ble _clean_loop
-.if 1
-_enable_mmu:
-	/*  defines the access permission for each of the sixteen memory domains. */
-	ldr r0, =0x0000ffff		@ [D0-D7]Manager, [D8-D15]No access
-	mcr p15, 0, r0, c3, c0, 0	@ Write Rt to DACR
 	
-	/* holds the base address of translation table 0. */
-	ldr r0, =mmu_table
-	mcr p15, 0, r0, c2, c0, 0	@ Write Rt to 32-bit TTBR0
-	
-	/* enable mmu */
-	mrc p15, 0, r0, c1, c0, 0	@ Read SCTLR into Rt
-	orr r0, r0, #(1<<0)		@ ---M ,PL1&0 stage 1 MMU enabled
-	mcr p15, 0, r0, c1, c0, 0	@ Write Rt to SCTLR
-.endif
 	ldr pc, start_armboot
 
 	
 start_armboot:
 	.word main
+
+_mmu_table_base:
+	.word mmu_table	
 	
 copy_sd_mmc_to_mem:
 	.word CopySDMMCtoMem
