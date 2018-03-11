@@ -160,8 +160,7 @@ nand_asm_init:
 	 
 	mov	pc, lr
 
-	
-#if 1
+
 	/* first-level section descriptor entry. */
 .macro FL_SECTION_ENTRY base,ap,d,c,b
 	.word (\base<<20) | (\ap<<10) | (\d<<5) | \
@@ -216,7 +215,7 @@ mmu_table:
 	FL_SECTION_ENTRY __base,3,0,1,1
 	.set __base,__base+1
 	.endr
-
+	
 	.set __base,0xD00
 	// 1:1 mapping for debugging with non-cacheable
 	.rept 0x1000 - 0xD00
@@ -248,5 +247,4 @@ mmu_table:
 	.set __base, __base+1
 	.endr
 #endif
-#endif /* #if 1 */
 .end

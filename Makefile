@@ -39,7 +39,7 @@ all start.bin:
 endif	# cpu/config.mk
 	
 gec210_config:
-	echo "TEXT_BASE = 0x33e00000" > cpu/config.mk
+	echo "TEXT_BASE = 0xc3e00000" > cpu/config.mk
 	
 %.o:%.S
 	$(CC) $< -o $@ -c $(CPPFLAGS) $(CFLAGS)
