@@ -6,6 +6,7 @@
  */
  
 #include <gec210single.h>
+#include "s5pc110.h"
 .include "s5p_regs.h"
 .include "api.h"
 
@@ -59,6 +60,35 @@ _cpu_init_crit:
         orr	r0, r0, #0x00000800     @ set bit 12 (Z---) I-cache enable
         mcr 	p15, 0, r0, c1, c0, 0
 
+        /* Read booting information */
+        ldr	r0, =PRO_ID_BASE
+        ldr	r1, [r0,#OMR_OFFSET]
+        bic	r2, r1, #0xffffffc1
+	
+	/* NAND BOOT */
+	cmp	r2, #0x0		@ eSSD
+	moveq	r3, #BOOT_NAND
+	cmp	r2, #0x2		@ 2KB 5-cycle	8-bit ECC
+	moveq	r3, #BOOT_NAND
+	cmp	r2, #0x4		@ 4KB 5-cycle	8-bit ECC
+	moveq	r3, #BOOT_NAND
+	cmp	r2, #0x6		@ 4KB 5-cycle	16-bit ECC
+	moveq	r3, #BOOT_NAND
+	cmp	r2, #0x8		@ OneNAND Mux
+	moveq	r3, #BOOT_ONENAND
+	/* SD/MMC BOOT */
+	cmp     r2, #0xc
+	moveq   r3, #BOOT_MMCSD	
+	/* NOR BOOT */
+	cmp     r2, #0x14
+	moveq   r3, #BOOT_NOR	
+	/* Uart BOOTONG failed */
+	cmp     r2, #(0x1<<4)
+	moveq   r3, #BOOT_SEC_DEV
+	
+	ldr	r0, =INF_REG_BASE
+	str	r3, [r0, #INF_REG3_OFFSET]	@ save into inform3 register
+	
 	/*
 	 * Go setup Memory and board specific bits prior to relocation.
 	 */
@@ -82,14 +112,51 @@ _cpu_init_crit:
 	bic	r2, r2, r0		/* r0 <- current base addr of code */
 	cmp     r1, r2                  /* compare r0, r1                  */
 	beq     _after_copy		/* r0 == r1 then skip flash copy   */
+
 	
 _relocate:
 	/* bootloader size:r2 = __bss_start - _start + 16 */
 	ldr	r1, =_start-16		@ link address
 	ldr	r2, =__bss_start
-	subs 	r2, r2, r1
+	subs 	r2, r2, r1	
+	/*
+	 * boot from specific device.
+	 */
+	ldr	r0, =INF_REG_BASE
+	ldr	r1, [r0, #INF_REG3_OFFSET]
+	cmp	r1, #BOOT_NAND		/* 0x0 => boot device is nand */
+	beq	nand_boot
+	cmp     r1, #BOOT_MMCSD
+	beq     mmcsd_boot
+	cmp     r1, #BOOT_SEC_DEV
+	beq     mmcsd_boot
+	b	boot_failed
 	
-_mmcsd_boot:
+nand_boot:
+	ldr	r0, =CFG_PHY_UBOOT_BASE
+	add	r3, r2, r0		@ r3 indicated BL2 ending address
+	/* @param_0 uint32 Source block address number */
+	ldr	r0, =0
+	/* @param_1 uint32 Source page address number to copy */
+	ldr	r1, =0
+	/* @param_2  uint8* Target Buffer pointer */
+	ldr	r2, =CFG_PHY_UBOOT_BASE
+_copy_nand_loop:
+	push	{r0, r1, r2, r3}
+	ldr	r4, copy_nand_to_mem
+	mov	lr, pc
+	ldr	pc, [r4]
+	pop	{r0, r1, r2, r3}
+	add	r1, #1
+	cmp	r1, #64
+	moveq	r1, #0
+	addeq	r0, #1
+	add	r2, r2, #(1<<11)	@ r2 += 2kB/page
+	cmp	r2, r3
+	blt	_copy_nand_loop		@ Target Buffer pointer less than BL2 ending address.
+	b	_after_copy
+	
+mmcsd_boot:
 	/* @param_0 channel */
 	ldr	r0, =0
 	/* @param_1 u32 StartBlkAddress */
@@ -107,7 +174,7 @@ _mmcsd_boot:
 	mov	lr, pc
 	ldr	pc, [r4]
 	b	_after_copy
-
+	
 _after_copy:
 
 _enable_mmu:
@@ -133,7 +200,7 @@ _enable_mmu:
 	nop
 	
 stack_setup:
-	ldr	fp, =(CFG_PHY_UBOOT_BASE + CFG_UBOOT_SIZE - 0x1000) @ configure stack into DDR2 sdram, 4KB for malloc, bdinfo
+	ldr	fp, =(CFG_UBOOT_BASE + CFG_UBOOT_SIZE - 0x1000) @ configure stack into DDR2 sdram, 4KB for malloc, bdinfo
 	sub	sp, fp, #12
 	
 _clean_bss:
@@ -145,7 +212,7 @@ _clean_loop:
 	cmp r0, r1
 	ble _clean_loop
 	
-	ldr pc, start_armboot
+	ldr pc, start_armboot		@ jump to BL2
 
 	
 start_armboot:
@@ -157,6 +224,13 @@ _mmu_table_base:
 copy_sd_mmc_to_mem:
 	.word CopySDMMCtoMem
 
+copy_nand_to_mem:
+	.word NF8_ReadPage_Adv
+	
+boot_failed:
+	nop			/* boot from specific device failed */
+	b	boot_failed
+	
        .align  5
 .global disable_l2cache
 disable_l2cache:
