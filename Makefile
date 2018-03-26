@@ -16,6 +16,7 @@ OBJDUMP := $(CROSS_COMPILE)objdump
 LDFLAGS := -Tlink.lds
 CPPFLAGS := -nostdinc -nostdlib
 CFLAGS := -fno-builtin -Wall -O2 -mfloat-abi=hard -I./include -g
+OBJCFLAGS := --gap-fill=0xff
 
 ifneq ($(TEXT_BASE),)
 CPPFLAGS += -DTEXT_BASE=$(TEXT_BASE)
@@ -27,7 +28,7 @@ all: start.bin clean
 
 start.bin:$(objs)
 	$(LD) $^ -o $(@:%.bin=%.elf) $(LDFLAGS)
-	$(OBJCOPY) -O binary -S $(@:%.bin=%.elf) $@
+	$(OBJCOPY) $(OBJCFLAGS) -O binary -S $(@:%.bin=%.elf) $@
 	$(OBJDUMP) -D $(@:%.bin=%.elf) > $(@:%.bin=%.dis)
 
 else	# !cpu/config.mk
