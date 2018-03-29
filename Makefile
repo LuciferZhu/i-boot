@@ -15,7 +15,7 @@ OBJDUMP := $(CROSS_COMPILE)objdump
 
 LDFLAGS := -Tlink.lds
 CPPFLAGS := -nostdinc -nostdlib
-CFLAGS := -fno-builtin -Wall -O2 -mfloat-abi=hard -I./include -g
+CFLAGS := -fno-builtin -Wall -Wstrict-prototypes -O2 -mfloat-abi=hard -I./include -g
 OBJCFLAGS := --gap-fill=0xff
 
 ifneq ($(TEXT_BASE),)
