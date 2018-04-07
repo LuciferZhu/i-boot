@@ -35,8 +35,8 @@
 #define S5PC11X_UART_CHANNELS		3
 #define S5PC11X_SPI_CHANNELS		2
 
-@#include <asm/hardware.h>
-/*
+//#include <asm/hardware.h>
+
 #ifndef __ASSEMBLY__
 typedef enum {
 	S5PC11X_UART0,
@@ -45,8 +45,8 @@ typedef enum {
 	S5PC11X_UART3,
 } S5PC11X_UARTS_NR;
 
-@#include <s5pc11x.h>
-#endif*/
+#include <s5pc11x.h>
+#endif
 
 #define BIT0 				0x00000001
 #define BIT1 				0x00000002
@@ -1769,7 +1769,6 @@ typedef enum {
 #define GINTSTS_RXFLvl		(1<<4)
 
 /* include common stuff */
-#if 0
 #ifndef __ASSEMBLY__
 static inline S5PC11X_MEMCTL * S5PC11X_GetBase_MEMCTL(void)
 {
@@ -1834,7 +1833,7 @@ static inline S5PC11X_SPI * S5PC11X_GetBase_SPI(void)
 #define LCDBGCON_OFFSET		0x5c
 
 #endif /* #ifndef __ASSEMBLY__ */
-#endif
+
 
 /* PENDING BIT */
 #define BIT_EINT0			(0x1)

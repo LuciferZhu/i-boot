@@ -212,11 +212,11 @@ _clean_loop:
 	cmp r0, r1
 	ble _clean_loop
 	
-	ldr pc, start_armboot		@ jump to BL2
+	ldr pc, _start_armboot		@ jump to BL2
 
 	
-start_armboot:
-	.word main
+_start_armboot:
+	.word start_armboot
 
 _mmu_table_base:
 	.word mmu_table	

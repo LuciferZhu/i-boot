@@ -69,7 +69,7 @@
 /* skip to load BL2 */
 //#define FAST_BOOT		1
 
-#define MEMORY_BASE_ADDRESS	0x30000000      //(2016-10-14朱相东修改)
+#define MEMORY_BASE_ADDRESS	0x30000000      //(2016-10-14朱相东修�?
 
 /* input clock of PLL */
 #define CONFIG_SYS_CLK_FREQ	24000000	/* the SMDK6400 has 24MHz input clock */
@@ -130,10 +130,10 @@
 #define CONFIG_DRIVER_DM9000	1
 
 #ifdef CONFIG_DRIVER_DM9000
-#define CONFIG_DM9000_BASE		(0x88000000)//(2016-10-14朱相东修改)
+#define CONFIG_DM9000_BASE		(0x88000000)//(2016-10-14朱相东修�?
 #define DM9000_IO			(CONFIG_DM9000_BASE)
 #if defined(DM9000_16BIT_DATA)
-#define DM9000_DATA			(CONFIG_DM9000_BASE+8)//(2016-10-14朱相东修改)
+#define DM9000_DATA			(CONFIG_DM9000_BASE+8)//(2016-10-14朱相东修�?
 #else
 #define DM9000_DATA			(CONFIG_DM9000_BASE+1)
 #endif
@@ -142,7 +142,7 @@
  * select serial console configuration
  */
 
-#define CONFIG_SERIAL1          1	/* we use UART1 on SMDKC110 */
+#define CONFIG_SERIAL1          1	/* we use UART0 on SMDKC110 */
 
 #define CFG_HUSH_PARSER			/* use "hush" command parser	*/
 #ifdef CFG_HUSH_PARSER
@@ -192,7 +192,7 @@
 #define CONFIG_CMD_PING
 #define CONFIG_CMD_DATE
 
-@#include <config_cmd_default.h>
+//#include <config_cmd_default.h>
 
 #define CONFIG_CMD_ELF
 #define CONFIG_CMD_DHCP
@@ -209,7 +209,7 @@
 #define CONFIG_BOOTP_HOSTNAME
 #define CONFIG_BOOTP_BOOTPATH
 
-#define CONFIG_BOOTARGS    	"console=ttySAC0,115200 root=/dev/mtdblock4 rootfstype=yaffs rw"	/* 2016-10-14朱相东修改 */ 
+#define CONFIG_BOOTARGS    	"console=ttySAC0,115200 root=/dev/mtdblock4 rootfstype=yaffs rw"	/* 2016-10-14 zxd modify*/
 #define CONFIG_ETHADDR		00:40:5c:26:0a:5b
 #define CONFIG_NETMASK          255.255.255.0
 #define CONFIG_IPADDR		192.168.1.48
@@ -244,7 +244,7 @@
  */
 #define CFG_LONGHELP				/* undef to save memory		*/
 
-#define CFG_PROMPT              "zxd_GEC210 # "   /* Monitor Command Prompt(2016-10-14朱相东修改)   */
+#define CFG_PROMPT              "zxd_GEC210 # "   /* Monitor Command Prompt(2016-10-14 zxd modify*/
 
 #define CFG_CBSIZE		256		/* Console I/O Buffer Size	*/
 #define CFG_PBSIZE		384		/* Print Buffer Size */
@@ -404,10 +404,10 @@
 	defined(CONFIG_CLK_400_100_166_133)
 
 #if defined(CONFIG_MCP_SINGLE)
-#define MEMORY_BASE_ADDRESS1	0x40000000	//(2016-10-12 20:26:04朱相东添加)
-#define DMC0_MEMCONTROL		0x00202400	//(2016-10-12 20:26:04朱相东添加)参考电路,BL=4, 1 chip, DDR2 type, dynamic self refresh, force precharge, dynamic power down off
-#define DMC0_MEMCONFIG_0	0x30F00313	// MemConfig0	256MB config, 8 banks,Mapping Method[12:15]0:linear, 1:linterleaved, 2:Mixed,(2016-10-12 20:19:53朱相东修改)
-#define DMC0_MEMCONFIG_1	0x00F00313	// MemConfig1 (2016-10-12 20:19:53朱相东修改)
+#define MEMORY_BASE_ADDRESS1	0x40000000	//(2016-10-12 20:26:04 zxd modify
+#define DMC0_MEMCONTROL		0x00202400	//(2016-10-12 20:26:04 zxd modify BL=4, 1 chip, DDR2 type, dynamic self refresh, force precharge, dynamic power down off
+#define DMC0_MEMCONFIG_0	0x30F00313	// MemConfig0	256MB config, 8 banks,Mapping Method[12:15]0:linear, 1:linterleaved, 2:Mixed,(2016-10-12 20:19:53 zxd modify
+#define DMC0_MEMCONFIG_1	0x00F00313	// MemConfig1 (2016-10-12 20:19:53 zxd modify)
 #define DMC0_TIMINGA_REF	0x00000618	// TimingAref	7.8us*133MHz=1038(0x40E), 100MHz=780(0x30C), 20MHz=156(0x9C), 10MHz=78(0x4E)
 #define DMC0_TIMING_ROW		0x1A233309	// [zxd] modify --0x28233287, TimingRow, for @200MHz
 #define DMC0_TIMING_DATA	0x23240101	// [zxd] modify ++wl=1,rl=1; --0x23240304, TimingData CL=3
@@ -415,16 +415,16 @@
 
 #define	DMC1_MEMCONTROL		0x00202400	// MemControl	BL=4, 2 chip, DDR2 type, dynamic self refresh, force precharge, dynamic power down off
 #define DMC1_MEMCONFIG_0	0x40F00313	// MemConfig0	512MB config, 8 banks,Mapping Method[12:15]0:linear, 1:linterleaved, 2:Mixed
-#define DMC1_MEMCONFIG_1	0x00F00313	// MemConfig1 (2016-10-12 20:19:53朱相东修改)
+#define DMC1_MEMCONFIG_1	0x00F00313	// MemConfig1 (2016-10-12 20:19:53 zxd modify)
 #define DMC1_TIMINGA_REF	0x00000618	// TimingAref	7.8us*133MHz=1038(0x40E), 100MHz=780(0x30C), 20MHz=156(0x9C), 10MHz=78(0x4
 #define DMC1_TIMING_ROW		0x1A233309	// [zxd] modify --0x28233289, TimingRow, for @200MHz
 #define DMC1_TIMING_DATA	0x23240101	// [zxd] modify ++wl=1,rl=1; --0x23240304, TimingData CL=3
 #define	DMC1_TIMING_PWR		0x07640121	// [zxd] modify ; --0x08280232, TimingPower
 #if defined(CONFIG_CLK_800_100_166_133) || defined(CONFIG_CLK_400_100_166_133)
-#define MEMORY_BASE_ADDRESS1 0x40000000		//(2016-10-12 20:26:04朱相东添加)
-#define DMC0_MEMCONTROL 0x00202400		//(2016-10-12 20:26:04朱相东添加)
-#define DMC0_MEMCONFIG_0	0x30F00313	// MemConfig0	256MB config, 8 banks,Mapping Method[12:15]0:linear, 1:linterleaved, 2:Mixed,(2016-10-12 20:19:53朱相东修改)
-#define DMC0_MEMCONFIG_1	0x00F00313	// MemConfig1 (2016-10-12 20:19:53朱相东修改)
+#define MEMORY_BASE_ADDRESS1 0x40000000		//(2016-10-12 20:26:04 zxd modify
+#define DMC0_MEMCONTROL 0x00202400		//(2016-10-12 20:26:04 zxd modify
+#define DMC0_MEMCONFIG_0	0x30F00313	// MemConfig0	256MB config, 8 banks,Mapping Method[12:15]0:linear, 1:linterleaved, 2:Mixed,(2016-10-12 20:19:53 zxd modify)
+#define DMC0_MEMCONFIG_1	0x00F00313	// MemConfig1 (2016-10-12 20:19:53 zxd modify)
 #define DMC0_TIMINGA_REF	0x0000030C	// TimingAref	7.8us*133MHz=1038(0x40E), 100MHz=780(0x30C), 20MHz=156(0x9C), 10MHz=78(0x4E)
 #define DMC0_TIMING_ROW		0x28233287	// TimingRow	for @200MHz
 #define DMC0_TIMING_DATA	0x23240304	// TimingData	CL=3
@@ -432,8 +432,8 @@
 
 
 #define	DMC1_MEMCONTROL		0x00202400	// MemControl	BL=4, 2 chip, DDR2 type, dynamic self refresh, force precharge, dynamic power down off
-#define DMC1_MEMCONFIG_0	0x40F00313	// MemConfig0	512MB config, 8 banks,Mapping Method[12:15]0:linear, 1:linterleaved, 2:Mixed(2016-10-12 20:19:53朱相东修改)
-#define DMC1_MEMCONFIG_1	0x00F00313	// MemConfig1 (2016-10-12 20:19:53朱相东修改)
+#define DMC1_MEMCONFIG_0	0x40F00313	// MemConfig0	512MB config, 8 banks,Mapping Method[12:15]0:linear, 1:linterleaved, 2:Mixed(2016-10-12 20:19:53 zxd modify)
+#define DMC1_MEMCONFIG_1	0x00F00313	// MemConfig1 (2016-10-12 20:19:53 zxd modify)
 #define DMC1_TIMINGA_REF	0x0000030C	// TimingAref	7.8us*133MHz=1038(0x40E), 100MHz=780(0x30C), 20MHz=156(0x9C), 10MHz=78(0x4
 #define DMC1_TIMING_ROW		0x28233289	// TimingRow	for @200MHz
 #define DMC1_TIMING_DATA	0x23240304	// TimingData	CL=3
@@ -470,10 +470,10 @@
 #endif
 
 #define CONFIG_NR_DRAM_BANKS    2          /* we have 2 bank of DRAM */
-#define SDRAM_BANK_SIZE         0x10000000    /* 256MB(2016-10-12 20:19:53朱相东修改) */
+#define SDRAM_BANK_SIZE         0x10000000    /* 256MB(2016-10-12 20:19:53 zxd modify */
 #define PHYS_SDRAM_1            MEMORY_BASE_ADDRESS /* SDRAM Bank #1 */
 #define PHYS_SDRAM_1_SIZE       SDRAM_BANK_SIZE
-#define PHYS_SDRAM_2            (MEMORY_BASE_ADDRESS1) /* SDRAM Bank #2(2016-10-12 20:19:53朱相东修改) */
+#define PHYS_SDRAM_2            (MEMORY_BASE_ADDRESS1) /* SDRAM Bank #2(2016-10-12 20:19:53 zxd modify */
 #define PHYS_SDRAM_2_SIZE       SDRAM_BANK_SIZE
 
 #define CFG_FLASH_BASE		0x80000000
@@ -609,9 +609,9 @@
 
 #define CONFIG_BOOTDELAY	3
 #if defined(CFG_FASTBOOT_NANDBSP)
-#define CONFIG_BOOTCOMMAND	"nand read 0x30008000 0x600000 0x500000; bootm 0x30008000" 		/*2016-10-14朱相东修改*/
+#define CONFIG_BOOTCOMMAND	"nand read 0x30008000 0x600000 0x500000; bootm 0x30008000" 		/*2016-10-14 zxd modify */
 #elif defined(CFG_FASTBOOT_SDMMCBSP)
-#define CONFIG_BOOTCOMMAND	"nand read 0x30008000 0x600000 0x500000; bootm 0x30008000"		/*2016-10-14朱相东修改*/
+#define CONFIG_BOOTCOMMAND	"nand read 0x30008000 0x600000 0x500000; bootm 0x30008000"		/*2016-10-14 zxd modify */
 #endif
 
 #endif	/* __CONFIG_H */
