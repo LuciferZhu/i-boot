@@ -35,7 +35,7 @@
 #define S5PC11X_UART_CHANNELS		3
 #define S5PC11X_SPI_CHANNELS		2
 
-//#include <asm/hardware.h>
+#include <asm/hardware.h>
 
 #ifndef __ASSEMBLY__
 typedef enum {
@@ -737,6 +737,8 @@ typedef enum {
 #define MP03DRV_REG                     __REG(ELFIN_GPIO_BASE + MP03DRV_SR_OFFSET)
 #define MP03CONPDN_REG                  __REG(ELFIN_GPIO_BASE + MP03CONPDN_OFFSET)       
 #define MP03PUDPDN_REG                  __REG(ELFIN_GPIO_BASE + MP03PUDPDN_OFFSET)
+
+#define MP06CON_REG                     __REG(ELFIN_GPIO_BASE + MP06CON_OFFSET)
 
 #define NFCONF_VAL	(7<<12)|(7<<8)|(7<<4)|(0<<3)|(1<<2)|(1<<1)|(0<<0)       
 #define NFCONT_VAL	(0<<18)|(0<<17)|(0<<16)|(0<<10)|(0<<9)|(0<<8)|(0<<7)|(0<<6)|(0x3<<1)|(1<<0)

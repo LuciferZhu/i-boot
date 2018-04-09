@@ -614,4 +614,9 @@
 #define CONFIG_BOOTCOMMAND	"nand read 0x30008000 0x600000 0x500000; bootm 0x30008000"		/*2016-10-14 zxd modify */
 #endif
 
+#define CFG_ADDR_IMAGE		(0x30008000)
+#define CFG_IMAGE_FROM		(0x600000)
+#define CFG_IMAGE_SIZE		(0x500000)
+
+
 #endif	/* __CONFIG_H */

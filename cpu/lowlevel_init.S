@@ -209,7 +209,7 @@ mmu_table:
 	.set __base,__base+1
 	.endr
 
-	.set __base,0x300               //(2016-10-14朱相东修改)
+	.set __base,0x300               //(2016-10-14 zxd modfiy)
 	// 256MB for SDRAM with cacheable
 	.rept 0xD00 - 0xC00
 	FL_SECTION_ENTRY __base,3,0,1,1

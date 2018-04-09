@@ -19,7 +19,7 @@
 #
 objs += cpu/start.o cpu/cpu_init.o cpu/lowlevel_init.o cpu/clk.o \
 	cpu/serial.o lib/board.o lib_generic/string.o lib_generic/vsprintf.o \
-	common/console.o lib_generic/ctype.o
+	common/console.o lib_generic/ctype.o cpu/nand.o
 
 #########################################################################
 ifeq (cpu/config.mk,$(wildcard cpu/config.mk))
