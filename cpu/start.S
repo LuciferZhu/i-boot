@@ -133,6 +133,7 @@ _relocate:
 	b	boot_failed
 	
 nand_boot:
+#if 0
 	ldr	r0, =CFG_PHY_UBOOT_BASE
 	add	r3, r2, r0		@ r3 indicated BL2 ending address
 	/* @param_0 uint32 Source block address number */
@@ -154,6 +155,14 @@ _copy_nand_loop:
 	add	r2, r2, #(1<<11)	@ r2 += 2kB/page
 	cmp	r2, r3
 	blt	_copy_nand_loop		@ Target Buffer pointer less than BL2 ending address.
+#else
+	ldr	r0, =0x7ff
+	add	r2, r0			@ r2 += 2047,
+	bic	r2, r0			@ len align 2kB
+	ldr	r0, =0			@ nand addr
+	ldr	r1, =CFG_PHY_UBOOT_BASE	@ buff addr
+	bl	nand_read
+#endif
 	b	_after_copy
 	
 mmcsd_boot:
@@ -176,7 +185,7 @@ mmcsd_boot:
 	b	_after_copy
 	
 _after_copy:
-
+#ifdef CONFIG_ENABLE_MMU
 _enable_mmu:
 	/*  defines the access permission for each of the sixteen memory domains. */
 	ldr	r0, =0x0000ffff		@ [D0-D7]Manager, [D8-D15]No access
@@ -198,7 +207,8 @@ _enable_mmu:
 	nop
 	nop
 	nop
-	
+#endif
+
 stack_setup:
 	ldr	fp, =(CFG_UBOOT_BASE + CFG_UBOOT_SIZE - 0x1000) @ configure stack into DDR2 sdram, 4KB for malloc, bdinfo
 	sub	sp, fp, #12

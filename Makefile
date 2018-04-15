@@ -19,7 +19,8 @@
 #
 objs += cpu/start.o cpu/cpu_init.o cpu/lowlevel_init.o cpu/clk.o \
 	cpu/serial.o lib/board.o lib_generic/string.o lib_generic/vsprintf.o \
-	common/console.o lib_generic/ctype.o cpu/nand.o
+	common/console.o lib_generic/ctype.o cpu/nand.o common/main.o \
+	common/image.o
 
 #########################################################################
 ifeq (cpu/config.mk,$(wildcard cpu/config.mk))
@@ -37,10 +38,11 @@ OBJCOPY := $(CROSS_COMPILE)objcopy
 OBJDUMP := $(CROSS_COMPILE)objdump
 
 gccincdir := $(shell $(CC) -print-file-name=include)
+DBGFLAGS = -g -DDEBUG
 
 LDFLAGS := -Ti-boot-gec210.lds
 CPPFLAGS := -ffreestanding -fno-builtin -nostdinc -isystem $(gccincdir) -I./include \
-		-O2 -mfloat-abi=hard -g
+		-O2 -mfloat-abi=softfp $(DBGFLAGS) -D__KERNEL__
 OBJCFLAGS := --gap-fill=0xff
 
 ifneq ($(TEXT_BASE),)
@@ -89,14 +91,17 @@ gec210_config:
 	
 clean:
 	rm -rf *.o
-	$(MAKE) clean -C cpu
+	$(MAKE) clean -C cpu	
 	$(MAKE) clean -C lib
+	$(MAKE) clean -C lib_generic
+	$(MAKE) clean -C common
 
 all_clean:
 	rm -rf *.o *.elf *.bin *.dis cpu/config.mk
 	$(MAKE) clean -C cpu	
 	$(MAKE) clean -C lib
 	$(MAKE) clean -C lib_generic
+	$(MAKE) clean -C common	
 	
 .PHONY:clean all_clean
 

@@ -24,7 +24,7 @@ extern void nand_init (void);
 
 extern void nand_read_id (char *buff);
 
-extern void nand_read (unsigned int addr,char *buf,unsigned int len);
+extern unsigned long nand_read (unsigned int addr,char *buf,unsigned int len);
  
 extern int nand_write (unsigned int addr,char *buf,unsigned int len);
  

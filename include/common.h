@@ -49,6 +49,7 @@ int	serial_tstc   (void);
 #include <linux/string.h>
 //#include <asm/ptrace.h>
 #include <stdarg.h>
+# include <asm/setup.h>
 
 
 #ifdef	DEBUG
@@ -100,6 +101,22 @@ void	panic(const char *fmt, ...)
 int	sprintf(char * buf, const char *fmt, ...)
 		__attribute__ ((format (__printf__, 2, 3)));
 int	vsprintf(char *buf, const char *fmt, va_list args);
+
+
+/* common/main.c */
+void	main_loop	(void);
+
+#include <image.h>
+
+
+#if 0
+int	run_command	(const char *cmd, int flag);
+int	readline	(const char *const prompt);
+int	readline_into_buffer	(const char *const prompt, char * buffer);
+int	parse_line (char *, char *[]);
+void	init_cmd_timeout(void);
+void	reset_cmd_timeout(void);
+#endif
 
 
 #if 0
@@ -176,7 +193,6 @@ int	vsprintf(char *buf, const char *fmt, va_list args);
 
 #include <part.h>
 #include <flash.h>
-#include <image.h>
 
 
 #define BUG() do { \
@@ -267,14 +283,6 @@ int	display_options (void);
 void	print_size (phys_size_t, const char *);
 int	print_buffer (ulong addr, void* data, uint width, uint count, uint linelen);
 
-/* common/main.c */
-void	main_loop	(void);
-int	run_command	(const char *cmd, int flag);
-int	readline	(const char *const prompt);
-int	readline_into_buffer	(const char *const prompt, char * buffer);
-int	parse_line (char *, char *[]);
-void	init_cmd_timeout(void);
-void	reset_cmd_timeout(void);
 
 /* lib_$(ARCH)/board.c */
 void	board_init_f  (ulong) __attribute__ ((noreturn));

@@ -23,7 +23,7 @@
 #define EN_NF0()			( NFCONT_REG &= ~(1<<1) )
 #define DIS_NF0()			( NFCONT_REG |= (1<<1) )
 #define IS_READY_NF0()			( NFSTAT_REG & 0x1 )
-
+#define PAGE_SIZE			(2048)
 
 /* K9K8G08U1A */
 void nand_init(void)
@@ -76,30 +76,61 @@ void nand_read_id (char *buff)
 }
 
 
-void nand_read (unsigned int addr,char *buf,unsigned int len)
+void nand_read_buf (unsigned long addr, char *buf,unsigned long len)
 {
-	int i;
+	unsigned long i, col, row;
 	EN_NF0();
 	
 	NFCMD_REG = 0x00;
+
+	col = addr & 0x7ff;			/* "addr & 0x7ff" -> addr%2048 */
+	row = addr>>11;				/* "addr>>11" -> addr/2048 */
 	
 	/* column addr */
-	NFADDR_REG = (addr & 0x7ff)& 0xff;		/* "addr & 0x7ff" -> addr%2048 */
-	NFADDR_REG = (addr & 0x7ff)>>8;
+	NFADDR_REG = col & 0xff;
+	NFADDR_REG = col >> 8;
+
 	/* row(page) addr */
-	NFADDR_REG = (addr>>11)&0xff;		/* "addr>>11" -> addr/2048 */
-	NFADDR_REG = (addr>>11)>>8 & 0xff;
-	NFADDR_REG = (addr>>11)>>16 & 0x7;
+	NFADDR_REG = row & 0xff;
+	NFADDR_REG = row >> 8 & 0xff;
+	NFADDR_REG = row >> 16 & 0x7;
 	
 	NFCMD_REG = 0x30;
 	
 	while( !IS_READY_NF0() );
-	
-	for(i=0; i<len; i++)
-		buf[i] = NFDATA8_REG;
+
+	if (col || len & (PAGE_SIZE-1) || ((ulong)buf) & 3) {
+		for(i=0; i<len; i++)
+			buf[i] = NFDATA8_REG;
+	} else {
+		for(i=0; i<len/sizeof(ulong); i++) {
+			((ulong*)buf)[i] = NFDATA_REG;	// pick up speed
+		}
+	}
 		
 	DIS_NF0();
 }
+
+
+/* read page align 2kB */
+unsigned long nand_read (unsigned long addr, char *buf, unsigned long len)
+{
+	unsigned long i = 0;
+
+	if (addr & (PAGE_SIZE-1) || len & (PAGE_SIZE-1)) {
+		printf("%s[%d] addr,len should align in 2kB\n", __func__, __LINE__);
+		return 0;
+	}
+
+	while (i < len) {
+		nand_read_buf (addr, buf + i, PAGE_SIZE);	/* only read a page */
+		i += PAGE_SIZE;
+		addr += PAGE_SIZE;
+	}
+
+	return i;
+}
+
 
 int nand_write (unsigned int addr,char *buf,unsigned int len)
 {
@@ -131,6 +162,7 @@ int nand_write (unsigned int addr,char *buf,unsigned int len)
 	
 	return ret;
 }
+
 
 /* erase basis block(128KB) */
 int nand_block_erase (unsigned int addr)

@@ -1,7 +1,7 @@
 #ifndef _LINUX_TYPES_H
 #define _LINUX_TYPES_H
 
-#ifdef	__KERNEL__
+#if 0//def	__KERNEL__
 #include <linux/config.h>
 #endif
 

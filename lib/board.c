@@ -18,40 +18,17 @@
  */
 
 #include <common.h>
-#include "nand.h"
 
 
 void start_armboot (void)
 {
-	int i;
-	char *image = (char *)CFG_ADDR_IMAGE;
-
 	printf("\n\n%s[%d] in\n", __func__, __LINE__);
 
 	__asm__ __volatile__("":::"memory");
 
-	/* 
-	 * load image into DDR.
-	 */
-	printf("Load image from nand flash...");
-	nand_read (CFG_IMAGE_FROM, image, CFG_IMAGE_SIZE);
-	printf("finish!\n");
-
-	for(i=0; i<64; i++)
-		printf("%02X ",image[i]);
+	/* stuff init sequence... */
 	
-	printf("\n");
-
-	/* 
-	 * setup any tag.
-	 */
-	
-	while(1)
-	{
-		if (tstc ())
-			putc ((char)getc());
-	}
-
-	for(;;);
+	for(;;)
+		main_loop ();
 }
 

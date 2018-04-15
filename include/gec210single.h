@@ -69,7 +69,7 @@
 /* skip to load BL2 */
 //#define FAST_BOOT		1
 
-#define MEMORY_BASE_ADDRESS	0x30000000      //(2016-10-14朱相东修�?
+#define MEMORY_BASE_ADDRESS	0x30000000      //(2016-10-14 zxd modify)
 
 /* input clock of PLL */
 #define CONFIG_SYS_CLK_FREQ	24000000	/* the SMDK6400 has 24MHz input clock */
@@ -521,7 +521,7 @@
 #ifdef CONFIG_ENABLE_MMU
 #define CFG_UBOOT_BASE		0xc3e00000
 #else
-#define CFG_UBOOT_BASE		0x23e00000
+#define CFG_UBOOT_BASE		0x33e00000
 #endif
 
 #define CFG_PHY_UBOOT_BASE	MEMORY_BASE_ADDRESS + 0x3e00000
@@ -614,9 +614,10 @@
 #define CONFIG_BOOTCOMMAND	"nand read 0x30008000 0x600000 0x500000; bootm 0x30008000"		/*2016-10-14 zxd modify */
 #endif
 
-#define CFG_ADDR_IMAGE		(0x30008000)
+
 #define CFG_IMAGE_FROM		(0x600000)
 #define CFG_IMAGE_SIZE		(0x500000)
+#define CFG_BOOT_PARAMS		(MEMORY_BASE_ADDRESS + 0x100)
 
 
 #endif	/* __CONFIG_H */
