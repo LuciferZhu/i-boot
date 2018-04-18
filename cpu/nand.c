@@ -53,21 +53,12 @@ void nand_read_id (char *buff)
 	volatile int i;
 	
 	EN_NF0();
-
-	i = 0x2000;
-	while (i--);
 	
 	NFCMD_REG = 0x90;
 	
-	i = 0x2000;
-	while (i--);
-	
 	NFADDR_REG = 0x00;
 
-	//while( !IS_READY_NF0() );
-
-	i = 0x2000;
-	while (i--);
+	while( !IS_READY_NF0() );
 	
 	for (i=0; i<5; i++)
 		buff[i] = NFDATA8_REG;

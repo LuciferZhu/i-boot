@@ -97,7 +97,7 @@ uart_asm_init:
 	ldr 	r1, =0x4f
 	str 	r1, [r0, #UTXH_OFFSET]
 
-	bx 	lr
+	mov	pc, lr
 	
 
 /*

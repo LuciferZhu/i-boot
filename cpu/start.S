@@ -1,10 +1,23 @@
-/* Copyright (C) 2017 Lucifer Zhu
+/*
+ * (C) Copyright 2018 Lucifer Zhu <LuciferZhu@yeah.net>
+ *  bootloader for gec210.
+ *  date: 2018-3-10 12:37:00
  *
- * date: 2018-3-10 12:37:00
- * e-mail: LuciferZhu@yeah.net
- * bootloader for gec210.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
- 
+
 #include <gec210single.h>
 #include "s5pc110.h"
 .include "s5p_regs.h"
@@ -50,6 +63,8 @@ _cpu_init_crit:
         mov	r0, #0                  @ set up for MCR
         mcr	p15, 0, r0, c8, c7, 0   @ invalidate TLBs
         mcr	p15, 0, r0, c7, c5, 0   @ invalidate icache
+	mcr     p15, 0, r0, c7, c10, 4	@ DSB
+	mcr     p15, 0, r0, c7, c5, 4	@ ISB
 	
         /*
          * disable MMU stuff and D-caches
@@ -57,7 +72,8 @@ _cpu_init_crit:
         mrc	p15, 0, r0, c1, c0, 0
         bic	r0, r0, #0x00000007     @ clear bits 2:0 (-CAM)
         orr	r0, r0, #0x00000002     @ set bit 1 (--A-) Align
-        orr	r0, r0, #0x00000800     @ set bit 12 (Z---) I-cache enable
+	orr	r0, r0, #(1<<11)	@ set bit 11 (Z---) BTB
+	orr	r0, r0, #(1<<12)	@ set bit 12 (I) I-cache
         mcr 	p15, 0, r0, c1, c0, 0
 
         /* Read booting information */
@@ -203,10 +219,10 @@ _enable_mmu:
 	mrc	p15, 0, r0, c1, c0, 0	@ Read SCTLR into Rt
 	orr	r0, r0, #(1<<0)		@ ---M ,PL1&0 stage 1 MMU enabled
 	mcr	p15, 0, r0, c1, c0, 0	@ Write Rt to SCTLR
-	nop
-	nop
-	nop
-	nop
+
+	/* Instruction Synchronization Barrier */
+	mov	r0, #0
+	mcr	p15, 0, r0, c7, c5, 4
 #endif
 
 stack_setup:
@@ -220,7 +236,7 @@ _clean_bss:
 _clean_loop:
 	str r2, [r0], #4
 	cmp r0, r1
-	ble _clean_loop
+	blo _clean_loop
 	
 	ldr pc, _start_armboot		@ jump to BL2
 

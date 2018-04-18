@@ -124,6 +124,8 @@ void setup_end_tag (void)
 
 	param->hdr.tag = ATAG_NONE;
 	param->hdr.size = 0;
+
+	debug("%s[%d] param=0x%p\n", __func__, __LINE__, param);
 }
 
 
@@ -151,7 +153,7 @@ void cleanup_for_linux (void)
 	/* flush(invaildate) I-cache */
 	__asm__ __volatile__("mcr p15, 0, %0, c7, c5, 0" : :"r"(i));
 	
-	/* mem barrier to sync up things */	
+	/* data Synchronization barrier to sync up things */
 	__asm__ __volatile__("mcr p15, 0, %0, c7, c10, 4": :"r"(i));
 
 }
@@ -179,18 +181,20 @@ void do_bootm_linux (unsigned long *image)
 	printf("\nStarting kernel...\n\n");
 #if 1
 	cleanup_for_linux();
-#if 1
-	debug("jump to kernel's entry point\n");
-
+#if 0
+#if 0
 	/* invaildate TLB */	
 	i = 0;
 	__asm__ __volatile__("mcr p15, 0, %0, c7, c5, 0" : :"r"(i));
-
+#endif
 	/* turn-off MMU */
 	__asm__ __volatile__("mrc p15, 0, %0, c1, c0, 0" :"=r"(i) :);
 	i &= ~(1<<0);
 	__asm__ __volatile__("mcr p15, 0, %0, c1, c0, 0" : :"r"(i));
 #endif
+	/* instruction barrier */
+	i = 0;
+	__asm__ __volatile__("mcr p15, 0, %0, c7, c5, 4": :"r"(i));
 #endif
 	theKernel(0, MACH_TYPE, CFG_BOOT_PARAMS);
 

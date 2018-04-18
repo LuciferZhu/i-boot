@@ -104,18 +104,4 @@ all_clean:
 	$(MAKE) clean -C common	
 	
 .PHONY:clean all_clean
-
-
-#obj-y += lib/
-
-#subdir-ym := $(patsubst %/,%,$(filter %/, $(obj-y)))
-
-#kbuild-file := $(wildcard $(subdir-ym)/Makefile)
-#include $(kbuild-file)
-
-
-
-#subdir-ym/built-in.o: 
-#	$(LD) -r -o lib/built-in.o 
-	
 	
