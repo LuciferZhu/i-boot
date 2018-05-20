@@ -32,13 +32,14 @@ include cpu/config.mk
 #
 #CROSS_COMPILE = /usr/local/arm/gcc-linaro-7.2.1-2017.11-i686_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
 CROSS_COMPILE = /usr/local/arm/arm-4.5.1/bin/arm-linux-
+
 CC := $(CROSS_COMPILE)gcc
 LD := $(CROSS_COMPILE)ld
 OBJCOPY := $(CROSS_COMPILE)objcopy
 OBJDUMP := $(CROSS_COMPILE)objdump
 
 gccincdir := $(shell $(CC) -print-file-name=include)
-DBGFLAGS = -g -DDEBUG
+DBGFLAGS = -g #-DDEBUG
 
 LDFLAGS := -Ti-boot-gec210.lds
 CPPFLAGS := -ffreestanding -fno-builtin -nostdinc -isystem $(gccincdir) -I./include \
@@ -104,4 +105,3 @@ all_clean:
 	$(MAKE) clean -C common	
 	
 .PHONY:clean all_clean
-	

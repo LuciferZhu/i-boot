@@ -198,6 +198,8 @@ mmcsd_boot:
 	ldr	r4, copy_sd_mmc_to_mem
 	mov	lr, pc
 	ldr	pc, [r4]
+
+	pop	{r4}
 	b	_after_copy
 	
 _after_copy:

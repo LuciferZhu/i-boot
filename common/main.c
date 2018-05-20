@@ -156,12 +156,15 @@ void cleanup_for_linux (void)
 	/* data Synchronization barrier to sync up things */
 	__asm__ __volatile__("mcr p15, 0, %0, c7, c10, 4": :"r"(i));
 
+	/* instruction barrier */
+	i = 0;
+	__asm__ __volatile__("mcr p15, 0, %0, c7, c5, 4": :"r"(i));
+
 }
 
 
 void do_bootm_linux (unsigned long *image)
 {
-	unsigned long i;
 	void (*theKernel)(int zero, int machid, ulong params);
 	uint32_t ep = image_get_ep((image_header_t *)image);
 	
@@ -179,25 +182,12 @@ void do_bootm_linux (unsigned long *image)
 	setup_end_tag();
 
 	printf("\nStarting kernel...\n\n");
-#if 1
+
 	cleanup_for_linux();
-#if 0
-#if 0
-	/* invaildate TLB */	
-	i = 0;
-	__asm__ __volatile__("mcr p15, 0, %0, c7, c5, 0" : :"r"(i));
-#endif
-	/* turn-off MMU */
-	__asm__ __volatile__("mrc p15, 0, %0, c1, c0, 0" :"=r"(i) :);
-	i &= ~(1<<0);
-	__asm__ __volatile__("mcr p15, 0, %0, c1, c0, 0" : :"r"(i));
-#endif
-	/* instruction barrier */
-	i = 0;
-	__asm__ __volatile__("mcr p15, 0, %0, c7, c5, 4": :"r"(i));
-#endif
+
 	theKernel(0, MACH_TYPE, CFG_BOOT_PARAMS);
 
+	/* It shouldn't run below code. */
 	puts("boot linux failed!\n");
 
 	return;
