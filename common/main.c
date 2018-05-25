@@ -205,7 +205,7 @@ void main_loop (void)
 {
 	int i, j;
 	ulong ret;
-	char *image = (char *)CFG_PHY_KERNEL_BASE;
+	char *image = (char *)(CFG_PHY_KERNEL_BASE - image_get_header_size());
 
 	debug("%s[%d] in\n", __func__, __LINE__);
 
